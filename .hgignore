@@ -1,0 +1,10 @@
+syntax: glob
+*.pyc
+.DS_Store
+.env
+geckodriver.log
+
+syntax: rootglob
+archive/static
+templates/diffs
+archive/unprocessed
