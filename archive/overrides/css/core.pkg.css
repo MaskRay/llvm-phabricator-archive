@@ -405,7 +405,8 @@ div.jx-typeahead-results {
 button,
 a.button,
 input[type="submit"] {
-  font: 13px 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* font: 13px 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; */
+  font: 13px sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -6938,7 +6939,7 @@ div.jx-tokenizer-container {
   line-height: 18px;
   color: inherit;
   vertical-align: middle;
-  font: 13px 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font: 13px sans-serif;
   -webkit-font-smoothing: antialiased
 }
 
@@ -11967,7 +11968,7 @@ div.phui-object-box.phui-object-box-flush {
 }
 
 .phui-object-box .phui-object-box .phui-header-shell .phui-header-header {
-  font-family: 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif
+  font-family: sans-serif;
 }
 
 .phui-object-box .phui-box-border {
