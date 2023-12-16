@@ -3,6 +3,20 @@ It is adapted from Raphaël Gomès's <https://foss.heptapod.net/mercurial/phab-a
 
 Nginx configuration
 ```
+map_hash_max_size 400000;
+map_hash_bucket_size 128;
+map $request_uri $svn_rev {
+  ~^/rL([0-9]+) $1;
+}
+map $svn_rev $git_commit {
+  include /var/www/phab-archive/svn_url_rewrite.conf;
+}
+
+server {
+  if ($git_commit) {
+    return 301 https://github.com/llvm/llvm-project/commit/$git_commit;
+  }
+
   root path/to/www;
 
   location ~ "^/D(?<diff>.{1,3})$" {
@@ -13,7 +27,7 @@ Nginx configuration
     if ($arg_id ~ ^(\d+)$) { rewrite ^ /diffs/$dir/D$dir$tail-$arg_id.html? last; }
     try_files /diffs/$dir/D$dir$tail.html =404;
   }
-
+}
 ```
 
 ---
