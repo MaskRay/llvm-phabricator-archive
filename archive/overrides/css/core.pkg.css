@@ -72,7 +72,8 @@ h6 {
 }
 
 body {
-  font: 13px 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* font: 13px 'Segoe UI', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; */
+  font: 13px sans-serif;
   direction: ltr;
   text-align: left;
   unicode-bidi: embed;
@@ -1976,7 +1977,7 @@ th.aphront-table-view-sortable-selected {
 }
 
 .aphront-table-view td {
-  padding: 8px 10px
+  padding: 2px 10px
 }
 
 .device-tablet .aphront-table-view th,

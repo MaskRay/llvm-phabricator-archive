@@ -173,11 +173,13 @@ def save_diff(browser, diff: str, diff_version_id=None, force=False) -> List[str
     save_diff_raw_patch(diff, diff_version_id, force=force)
     return save_diff_html(browser, diff, diff_version_id, force=force)
 
+# last: https://reviews.llvm.org/D159553
+NUM = 159554
 
 def get_diff_numbers():
     # This includes unlanded changes and will hit non-public ones
     # That's fine.
-    diffs = [f"D{num}" for num in range(1, 12700)]
+    diffs = [f"D{num}" for num in range(1, NUM)]
     return diffs
 
 
@@ -191,7 +193,7 @@ def main(diff_file: Optional[Path], force: bool = False):
                 )
         print("Using provided diffs (shuffled)", flush=True)
     else:
-        print("Using default (shuffled) diff range of 1 to 14000", flush=True)
+        print(f"Using default (shuffled) diff range of 1 to {NUM}", flush=True)
         diffs = get_diff_numbers()
 
     if force:
@@ -208,8 +210,9 @@ def main(diff_file: Optional[Path], force: bool = False):
 
     patch_beautifulsoup(BeautifulSoup)
 
-    print("Opening headless Firefox...", flush=True)
-    browser = webdriver.Firefox(options=options)
+    #print("Opening headless Firefox...", flush=True)
+    #browser = webdriver.Firefox(options=options)
+    browser = webdriver.Chrome(options=options)
     for diff in diffs:
         try:
             diff_versions = save_diff(browser, diff, force=force)

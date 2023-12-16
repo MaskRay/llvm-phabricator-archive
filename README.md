@@ -1,3 +1,23 @@
+This contains the code for the static archive of `reviews.llvm.org`.
+It is adapted from Raphaël Gomès's <https://foss.heptapod.net/mercurial/phab-archive>.
+
+Nginx configuration
+```
+  root path/to/www;
+
+  location ~ "^/D(?<diff>.{1,3})$" {
+    if ($arg_id ~ ^(\d+)$) { rewrite ^ /diffs/$diff/D$diff-$arg_id.html? last; }
+    try_files /diffs/$diff/D$diff.html =404;
+  }
+  location ~ ^/D(?<dir>...)(?<tail>.+) {
+    if ($arg_id ~ ^(\d+)$) { rewrite ^ /diffs/$dir/D$dir$tail-$arg_id.html? last; }
+    try_files /diffs/$dir/D$dir$tail.html =404;
+  }
+
+```
+
+---
+
 # `phab.mercurial-scm.org` static archive
 
 This contains the code for the download scripts and the static archive of `phab.mercurial-scm.org` itself.

@@ -1,7 +1,8 @@
 from pathlib import Path
 from flask import Flask, render_template, request, send_from_directory
+from waitress import serve
 
-from .archive import get_sharded_diff_path
+from archive import get_sharded_diff_path
 
 app = Flask(__name__, static_url_path="")
 
@@ -60,16 +61,15 @@ def diff_view(diff):
     raw_patch = request.args.get("download")
 
     path = get_sharded_diff_path(f"D{diff}", diff_version, raw_patch)
-
-    if raw_patch:
-        return send_from_directory(
-            str(TEMPLATES_FOLDER / path.parent),
-            str(path.name),
-            mimetype="text/plain",
-        )
-    return render_template(str(path.relative_to(TEMPLATES_FOLDER.absolute())))
+    return send_from_directory(
+        str(TEMPLATES_FOLDER / path.parent),
+        str(path.name),
+        mimetype="text/plain" if raw_patch else "text/html",
+    )
 
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
+serve(app, port=5000)

@@ -55,46 +55,46 @@ OVERRIDES = [
         "css/differential.pkg.css",
         False,
     ),
-    (
-        "head > link[href$='conpherence.pkg.css']",
-        "href",
-        "css/conpherence.pkg.css",
-        False,
-    ),
+    # (
+    #     "head > link[href$='conpherence.pkg.css']",
+    #     "href",
+    #     "css/conpherence.pkg.css",
+    #     False,
+    # ),
     (
         "head > link[href$='phui-button-bar.css']",
         "href",
         "css/phui-button-bar.css",
         True,
     ),
-    (
-        "head > link[href$='phui-head-thing.css']",
-        "href",
-        "css/phui-head-thing.css",
-        False,
-    ),
+    # (
+    #     "head > link[href$='phui-head-thing.css']",
+    #     "href",
+    #     "css/phui-head-thing.css",
+    #     False,
+    # ),
     # More JS
     ("head > script[src$='core/init.js']", "src", "js/init.js", False),
-    ("body > script[src$='PHUIXButtonView.js']", "src", "js/PHUIXButtonView.js", False),
+    # ("body > script[src$='PHUIXButtonView.js']", "src", "js/PHUIXButtonView.js", False),
     (
         "body > script[src$='diffusion.pkg.js']",
         "src",
         "js/diffusion.pkg.js",
         True,  # Not present on diffs that haven't landed
     ),
-    (
-        "body > script[src$='behavior-phui-submenu.js']",
-        "src",
-        "js/behavior-phui-submenu.js",
-        False,
-    ),
+    # (
+    #     "body > script[src$='behavior-phui-submenu.js']",
+    #     "src",
+    #     "js/behavior-phui-submenu.js",
+    #     False,
+    # ),
     ("body > script[src$='core.pkg.js']", "src", "js/core.pkg.js", False),
-    (
-        "body > script[src$='behavior-phui-tab-group.js']",
-        "src",
-        "js/behavior-phui-tab-group.js",
-        False,
-    ),
+    # (
+    #     "body > script[src$='behavior-phui-tab-group.js']",
+    #     "src",
+    #     "js/behavior-phui-tab-group.js",
+    #     False,
+    # ),
 ]
 
 
@@ -108,6 +108,11 @@ def override_links(soup):
                 raise ValueError(f"Override failed for {selector}")
         else:
             selected[target_attr] = f"overrides/{new_value}"
+            #if new_value == "js/differential.pkg.js":
+            #    for name in ("js/PHUIXButtonView.js", "js/behavior-phui-submenu.js", "js/behavior-phui-tab-group.js"):
+            #        script = soup.new_tag("script")
+            #        script["src"] = f"overrides/{name}"
+            #        selected.insert_after(script)
     return soup
 
 
@@ -120,6 +125,8 @@ def process_html(html, diff, diff_version_id):
     soup = override_links(soup)
 
     # TODO look into removing superfluous <data> tags?
+    #for d in soup.select("data"):
+    #    d.decompose()
 
     # Remove login buttons
     soup.select_one("a.phabricator-core-login-button").decompose()
@@ -133,30 +140,31 @@ def process_html(html, diff, diff_version_id):
     for picture in soup.select("a.phui-timeline-image[href^='/p/']"):
         picture["style"] = "background-image: url(overrides/css/profile.png)"
 
-    # Remove "view options" buttons
-    for button in soup.select("a[data-sigil='differential-view-options']"):
-        button.decompose()
+    for picture in soup.select(".phui-curtain-object-ref-view-image-cell > a"):
+        picture["style"] = ""
 
-    # Remove "show X lines" links
-    for button in soup.select("tr[data-sigil='context-target']"):
-        button.decompose()
-
-    # Remove "inline reply" links
-    for button in soup.select("div.inline-head-right > span.inline-button-divider"):
-        button.decompose()
+    # Remove sidebar buttons
+    for li in soup.select(".phabricator-action-view"):
+        if 'Download' not in li.text:
+            li.decompose()
 
     # Remove useless links in the sidebar
-    ul = soup.select_one("ul.phabricator-action-list-view")
-    ul.contents = [list(ul.children)[2]]
+    for div in soup.select(".phui-curtain-panel"):
+        if 'Subscribers' in div.text or 'Tags' in div.text:
+            div.decompose()
 
     # Remove search bar
     soup.select_one("ul.phabricator-search-menu").decompose()
 
     # Remove header action links
-    soup.select_one("div.phui-header-action-links").decompose()
+    for div in soup.select(".phui-header-action-links"):
+        div.decompose()
+    # Remove "View Options"
+    for div in soup.select(".differential-changeset-buttons"):
+        div.decompose()
 
     # Remove notifications (read-only mode, etc.)
-    soup.select_one("div.jx-notification-container").decompose()
+    # soup.select_one("div.jx-notification-container").decompose()
 
     # Set rel=nofollow on all external links to prevent SEO abuse
     for link in soup.select("body * a"):
@@ -174,16 +182,16 @@ def process_html(html, diff, diff_version_id):
     soup.select_one("div.differential-update-history-footer").decompose()
 
     # Add archive header
-    page = soup.select_one("div.phabricator-standard-page")
-    page.insert(1, BeautifulSoup(ARCHIVE_HEADER_HTML, "html.parser"))
+    banner = soup.select_one(".phabricator-standard-page > div > h1")
+    banner.string = "This is an archive of the discontinued LLVM Phabricator instance."
 
     # Change commit links to just point to the repository
     for link in soup.select("div.phui-main-column * a.phui-handle"):
         href = link.get("href")
-        if href.startswith("/rHG"):
-            link["href"] = f"https://mercurial-scm.org/repo/hg/rev/{href[4:]}"
-        elif href.startswith("/diffusion/HG/"):
-            link["href"] = f"https://mercurial-scm.org/repo/hg"
+        if href.startswith("/rG"):
+            link["href"] = f"https://github.com/llvm/llvm-project/commit/{href[3:]}"
+        elif href.startswith("/diffusion/G/"):
+            link["href"] = f"https://github.com/llvm/llvm-project"
 
     html = str(soup)
     print(f"{print_prefix}: html successfully processed", flush=True)

@@ -268,4 +268,33 @@ JX.install('PhabricatorDragAndDropFileUpload', {
             type = e.getType(); if (type === 'mouseout') { unhighlight(); return; } if (!hasHighlightModifierKey(e)) { return; } var
                 target = e.getTarget(); try { if (JX.DOM.findAbove(target, 'div', 'differential-inline-comment')) { return; } } catch (ex) { } if (JX.DOM.isNode(target, 'span') && (target.className === 'bright')) { target = target.parentNode; } if (type === 'click') { openSearch(target, e.getNodeData('has-symbols').symbols); e.kill(); return; } if (e.getType() === 'mouseover') { while (target && target !== document.body) { if (!JX.DOM.isNode(target, 'span')) { target = target.parentNode; continue; } if (!class_map.hasOwnProperty(target.className)) { target = target.parentNode; continue; } highlighted = target; JX.DOM.alterClass(highlighted, classHighlight, true); break; } }
         });
-}); JX.behavior('aphront-more', function () {}); JX.install('DiffInline', {}); JX.install('DiffChangeset', {}); JX.install('DiffChangesetList', {});
+}); JX.behavior('aphront-more', function () {}); JX.install('DiffInline', {}); JX.install('DiffChangeset', {}); JX.install('DiffChangesetList', {});JX.install('PHUIXButtonView',{statics:{BUTTONTYPE_DEFAULT:'buttontype.default',BUTTONTYPE_SIMPLE:'buttontype.simple'},members:{_node:null,_textNode:null,_auralNode:null,_iconView:null,_color:null,_selected:null,_buttonType:null,setIcon:function(icon){this.getIconView().setIcon(icon);return this;},getIconView:function(){if(!this._iconView){this._iconView=new
+JX.PHUIXIconView();this._redraw();}return this._iconView;},setColor:function(color){var
+node=this.getNode();if(this._color){JX.DOM.alterClass(node,'button-'+this._color,false);}this._color=color;JX.DOM.alterClass(node,'button-'+this._color,true);return this;},setSelected:function(selected){var
+node=this.getNode();this._selected=selected;JX.DOM.alterClass(node,'selected',this._selected);return this;},setButtonType:function(button_type){var
+self=JX.PHUIXButtonView;this._buttonType=button_type;var
+node=this.getNode();var
+is_simple=(this._buttonType==self.BUTTONTYPE_SIMPLE);JX.DOM.alterClass(node,'phui-button-simple',is_simple);return this;},setText:function(text){JX.DOM.setContent(this._getTextNode(),text);this._redraw();return this;},setAuralLabel:function(label){JX.DOM.setContent(this._getAuralNode(),label);this._redraw();return this;},getNode:function(){if(!this._node){var
+attrs={className:'button'};this._node=JX.$N('button',attrs);this._redraw();}return this._node;},_getTextNode:function(){if(!this._textNode){var
+attrs={className:'phui-button-text'};this._textNode=JX.$N('div',attrs);}return this._textNode;},_getAuralNode:function(){if(!this._auralNode){var
+attrs={className:'aural-only'};this._auralNode=JX.$N('span',attrs);}return this._auralNode;},_redraw:function(){var
+node=this.getNode();var
+aural=this._auralNode;var
+icon=this._iconView;var
+text=this._textNode;var
+content=[];if(aural){content.push(aural);}if(icon){content.push(icon.getNode());}if(text){content.push(text);}JX.DOM.alterClass(node,'has-icon',!!icon);JX.DOM.alterClass(node,'has-text',!!text);JX.DOM.setContent(node,content);}}});JX.behavior('phui-submenu',function(){JX.Stratcom.listen('click','phui-submenu',function(e){if(!e.isNormalClick()){return;}var
+node=e.getNode('phui-submenu');var
+data=e.getNodeData('phui-submenu');e.kill();data.open=!data.open;for(var
+ii=0;ii<data.itemIDs.length;ii++){var
+id=data.itemIDs[ii];var
+item=JX.$(id);if(data.open){JX.DOM.show(item);}else{JX.DOM.hide(item);}JX.DOM.alterClass(item,'phui-submenu-animate',data.open);}JX.DOM.alterClass(node,'phui-submenu-open',data.open);var
+caret=JX.$(data.caretID);JX.DOM.alterClass(caret,'caret',data.open);JX.DOM.alterClass(caret,'caret-right',!data.open);});});JX.behavior('phui-tab-group',function(){JX.Stratcom.listen('click','phui-tab-view',function(e){e.kill();var
+map=e.getNodeData('phui-tab-group-view').tabMap;var
+key=e.getNodeData('phui-tab-view').tabKey;var
+group=e.getNode('phui-tab-group-view');var
+tab=e.getNode('phui-tab-view');var
+tabs=JX.DOM.scry(group,'li','phui-tab-view');for(var
+ii=0;ii<tabs.length;ii++){JX.DOM.alterClass(tabs[ii],'phui-list-item-selected',(tabs[ii]==tab));}for(var
+k
+in
+map){if(k==key){JX.DOM.show(JX.$(map[k]));}else{JX.DOM.hide(JX.$(map[k]));}}});});
