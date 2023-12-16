@@ -12,20 +12,33 @@ map $svn_rev $git_commit {
   include /var/www/phab-archive/svn_url_rewrite.conf;
 }
 
+map $arg_download $ext {
+  "" ".html";
+  default ".diff";
+}
+map $arg_id $docid {
+  "" "";
+  default "-$arg_id";
+}
+
 server {
+  listen 80 default_server;
+  listen [::]:80 default_server;
+  root /var/www/phab-archive/www;
+  server_name _;
+
   if ($git_commit) {
     return 301 https://github.com/llvm/llvm-project/commit/$git_commit;
   }
 
-  root path/to/www;
+  include mime.types;
+  types { text/plain diff; }
 
   location ~ "^/D(?<diff>.{1,3})$" {
-    if ($arg_id ~ ^(\d+)$) { rewrite ^ /diffs/$diff/D$diff-$arg_id.html? last; }
-    try_files /diffs/$diff/D$diff.html =404;
+    try_files /diffs/$diff/D$diff$docid$ext =404;
   }
-  location ~ ^/D(?<dir>...)(?<tail>.+) {
-    if ($arg_id ~ ^(\d+)$) { rewrite ^ /diffs/$dir/D$dir$tail-$arg_id.html? last; }
-    try_files /diffs/$dir/D$dir$tail.html =404;
+  location ~ ^/D(?<diff>(?<dir>...).+)$ {
+    try_files /diffs/$dir/D$diff$docid$ext =404;
   }
 }
 ```
