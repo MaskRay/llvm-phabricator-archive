@@ -203,9 +203,6 @@ def main(diff, force=False):
 
     unprocessed_path_parent = get_sharded_diff_path(diff, processed=False).parent
     processed_path = get_sharded_diff_path(diff, processed=True)
-    if processed_path.exists() and not force:
-        print(f"{diff} already processed, skipping", flush=True)
-        return
 
     for html_path in unprocessed_path_parent.glob(f"{diff}*.html"):
         diff = html_path.stem
@@ -213,8 +210,10 @@ def main(diff, force=False):
         if "-" in diff:
             diff, diff_version_id = html_path.stem.split("-")
 
-        processed_html = process_html(html_path.read_text(), diff, diff_version_id)
         outpath = processed_path.parent / html_path.name
+        if outpath.exists() and not force:
+            continue
+        processed_html = process_html(html_path.read_text(), diff, diff_version_id)
         save_with_rename(processed_html.encode(), outpath)
 
 
