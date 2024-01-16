@@ -7,6 +7,7 @@ from tenacity import retry as tenacity_retry, wait_exponential, stop_after_attem
 # The large=true querystring parameter expands all files no matter the size
 # of the diff. See D12254 for an example
 DIFF_URL = "https://reviews.llvm.org/{diff}?large=true&id={diff_version_id}"
+DIFF_URL = "https://reviews.llvm.org/{diff}?id={diff_version_id}"
 BASE_PATH = pathlib.Path(__file__).parent.parent
 DIFFS_PROCESSED_FOLDER = BASE_PATH / "templates" / "diffs"
 DIFFS_UNPROCESSED_FOLDER = BASE_PATH / "archive" / "unprocessed" / "diffs"

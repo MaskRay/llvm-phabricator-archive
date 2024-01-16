@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
 from pathlib import Path
 import random
 import sys
@@ -76,25 +77,42 @@ def load_diff(browser, diff, url, diff_version_id):
     # Expand all comments. Some diffs with a ton of comments don't fully load
     for older_link in older_links:
         print(f"{print_prefix}: found older comments to load, clicking", flush=True)
-        older_link.click()
-        criteria = (
-            By.XPATH,
-            '//div[contains(text(), " created this revision.") and contains(@class, "phui-timeline-title")]',
-        )
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located(criteria))
+        try:
+            older_link.click()
+            criteria = (
+                By.XPATH,
+                '//div[contains(text(), " created this revision.") and contains(@class, "phui-timeline-title")]',
+            )
+            WebDriverWait(browser, 10).until(EC.presence_of_element_located(criteria))
+        except:
+            # Work around NoSuchElementError@chrome
+            pass
 
     show_more_buttons = browser.find_elements(
         By.XPATH,
         '//a[@data-sigil="show-more" and contains(text(), "Show File Contents")]',
     )
-    for button in show_more_buttons:
-        print(f"{print_prefix}: found folded file to load, clicking", flush=True)
-        button.click()
+
+    for button in show_more_buttons[0:20]:
+        try:
+            m = re.match(r'([\d,]+) lines', button.find_element(By.XPATH,'..').text)
+            if not m: continue
+            lines = int(m.replace(',', ''))
+            if lines > 10000:
+                print(f"{print_prefix}: found folded file to load, skip due to too long: {lines}", flush=True)
+                continue
+            print(f"{print_prefix}: found folded file to load, clicking", flush=True)
+            button.click()
+        except Exception as e:
+            pass
         # No need to wait here since we're waiting for all file loaders at the
         # end of the function
 
     print(f"{print_prefix}: waiting until all loaders have disappeared", flush=True)
-    WebDriverWait(browser, 60).until(AllLoaderHaveDisappeared())
+    try:
+        WebDriverWait(browser, 30).until(AllLoaderHaveDisappeared())
+    except:
+        pass
 
 
 def get_subdiffs(soup, diff: str, diff_version_id=None):
@@ -179,7 +197,8 @@ NUM = 159554
 def get_diff_numbers():
     # This includes unlanded changes and will hit non-public ones
     # That's fine.
-    diffs = [f"D{num}" for num in range(1, NUM)]
+    #diffs = [f"D{num}" for num in range(1, NUM)]
+    diffs = []
     return diffs
 
 
