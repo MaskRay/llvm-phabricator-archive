@@ -2,5 +2,4 @@ User-Agent: *
 Disallow: /diffusion/
 Disallow: /source/
 Disallow: /r*
-Disallow: /
 Crawl-delay: 1
